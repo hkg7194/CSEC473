@@ -1,0 +1,57 @@
+---
+# connect to localhost
+- hosts: postgres
+# variables
+  vars:
+   db_user: postgres
+   db_name: courses
+   db_password: postgres
+# tasks for Ansible to perform
+  tasks:
+# Install the dependencies for Postgres
+  - name: Install Dependencies
+    apt: 
+     name:
+     - bash
+     - openssl
+     - libssl-dev
+     - libssl-doc
+# Install PostgreSQL and check that the service is running
+  - name: Install PostgreSQL
+    apt:
+     name:
+     - postgresql
+     - postgresql-contrib
+     - libpq-dev
+     - python3-psycopg2
+  - name: Check that PostgreSQL is running
+    service: 
+     name: postgresql 
+     state: started 
+     enabled: yes
+# Create the database and give the user postgres access to the database
+  - name: Create the database
+    become: true
+    become_user: postgres
+    postgresql_db:
+     name: course
+     template: 'template0'
+     state: present
+  - name: Give user access to the database
+    become: true
+# For some reason the script only works with the postgres user
+    become_user: postgres
+    postgresql_user: 
+     db: course
+     name: postgres
+     password: postgres
+     priv: ALL
+     state: present
+# Add dummy data to the database (for testing the script)
+  - name: Add dummy data
+    become: true
+    become_user: postgres
+# Dummy data has to be put in /tmp directory
+    shell:
+     psql course < /tmp/dump.sql
+# Hannah Grape 1/27/2022

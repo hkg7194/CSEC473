@@ -1,0 +1,11 @@
+---
+- hosts: file
+  tasks:
+  - name: Create a file with information
+    copy:
+      dest: "/home/test.txt"
+      content: |
+        Hannah Grape
+        HW2
+        Feature Script
+# Hannah Grape 1/27/2022
